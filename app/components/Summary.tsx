@@ -2,7 +2,8 @@ import React from "react";
 
 interface FlightInfo {
   destination: string;
-  class: { [className: string]: number };
+  class: string;
+  priceUSD: number;
 }
 
 interface FormData {
@@ -24,17 +25,20 @@ interface SummaryProps {
 }
 
 export default function Summary({ formData, flightData }: SummaryProps) {
-  const flight = flightData.find(f => f.destination === formData.destination);
-  const price = flight?.class?.[formData.flightType];
+  const match = flightData.find(
+    (f) =>
+      f.destination === formData.destination &&
+      f.class === formData.flightType
+  );
 
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6">Summary</h2>
 
-      <p><strong>Destination:</strong> {formData.destination}</p>
-      <p><strong>Flight Class:</strong> {formData.flightType}</p>
-      <p><strong>Departure Date:</strong> {formData.departureDate}</p>
-      <p><strong>Return Date:</strong> {formData.returnDate}</p>
+      <p><strong>Destination:</strong> {formData.destination || "Not selected"}</p>
+      <p><strong>Flight Class:</strong> {formData.flightType || "Not selected"}</p>
+      <p><strong>Departure Date:</strong> {formData.departureDate || "Not selected"}</p>
+      <p><strong>Return Date:</strong> {formData.returnDate || "Not selected"}</p>
       <p><strong>Travelers:</strong> {formData.travelers}</p>
       <p><strong>Pets:</strong> {formData.pets ? "Yes" : "No"}</p>
       <p><strong>Extra Luggage:</strong> {formData.extraLuggage ? "Yes" : "No"}</p>
@@ -44,14 +48,15 @@ export default function Summary({ formData, flightData }: SummaryProps) {
 
       <hr className="my-6" />
 
-      <p className="text-lg font-bold">
-        {price !== undefined
-          ? `Price: $${price}`
-          : "Price not available for this selection."}
-      </p>
+      {match ? (
+        <p className="text-lg font-bold">Price: ${match.priceUSD}</p>
+      ) : (
+        <p className="text-red-600">Price not available for the selected flight.</p>
+      )}
     </div>
   );
 }
+
 
 
 

@@ -6,7 +6,8 @@ import Summary from './Summary';
 
 interface FlightInfo {
   destination: string;
-  class: { [className: string]: number }; // ✅ corrected from `classes`
+  class: string;
+  priceUSD: number;
 }
 
 interface FormData {
