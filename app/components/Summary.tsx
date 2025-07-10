@@ -1,84 +1,64 @@
-import React from 'react';
+import React from "react";
 
 interface FlightInfo {
   destination: string;
-  classes: { [className: string]: number };
+  class: { [className: string]: number };
 }
 
-const Summary = ({
-  formData,
-  flightData,
-}: {
-  formData: any;
-  flightData: FlightInfo[];
-}) => {
-  // Find price for selected destination and flightType
-  const selectedFlight = flightData.find(f => f.destination === formData.destination);
-  const pricePerTraveler =
-    selectedFlight && formData.flightType
-      ? selectedFlight.classes[formData.flightType] || 0
-      : 0;
+interface FormData {
+  destination: string;
+  flightType: string;
+  travelers: number;
+  pets: boolean;
+  extraLuggage: boolean;
+  insurance: boolean;
+  disabledSeats: boolean;
+  specialAssistance: boolean;
+  departureDate: string;
+  returnDate: string;
+}
 
-  const totalPrice = pricePerTraveler * (Number(formData.travelers) || 0);
+interface SummaryProps {
+  formData: FormData;
+  flightData: FlightInfo[];
+}
+
+export default function Summary({ formData, flightData }: SummaryProps) {
+  const flight = flightData.find(f => f.destination === formData.destination);
+  const price = flight?.class?.[formData.flightType];
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-semibold text-gray-800">Summary</h2>
+    <div>
+      <h2 className="text-2xl font-semibold mb-6">Summary</h2>
 
-      <div className="space-y-4 text-gray-700">
-        {/* Destination Details */}
-        <div>
-          <h3 className="text-lg font-medium text-[#6698CC] mb-2">Destination Details</h3>
-          <p>
-            <span className="font-medium">Destination:</span> {formData.destination}
-          </p>
-          <p>
-            <span className="font-medium">Departure Date:</span> {formData.departureDate}
-          </p>
-          <p>
-            <span className="font-medium">Return Date:</span> {formData.returnDate}
-          </p>
-          <p>
-            <span className="font-medium">Type of Flight:</span> {formData.flightType}
-          </p>
-          <p>
-            <span className="font-medium">Price per Traveler:</span> ${pricePerTraveler.toFixed(2)}
-          </p>
-          <p>
-            <span className="font-medium">Total Price:</span> ${totalPrice.toFixed(2)}
-          </p>
-        </div>
+      <p><strong>Destination:</strong> {formData.destination}</p>
+      <p><strong>Flight Class:</strong> {formData.flightType}</p>
+      <p><strong>Departure Date:</strong> {formData.departureDate}</p>
+      <p><strong>Return Date:</strong> {formData.returnDate}</p>
+      <p><strong>Travelers:</strong> {formData.travelers}</p>
+      <p><strong>Pets:</strong> {formData.pets ? "Yes" : "No"}</p>
+      <p><strong>Extra Luggage:</strong> {formData.extraLuggage ? "Yes" : "No"}</p>
+      <p><strong>Insurance:</strong> {formData.insurance ? "Yes" : "No"}</p>
+      <p><strong>Disabled Seats:</strong> {formData.disabledSeats ? "Yes" : "No"}</p>
+      <p><strong>Special Assistance:</strong> {formData.specialAssistance ? "Yes" : "No"}</p>
 
-        {/* Travelers Info */}
-        <div>
-          <h3 className="text-lg font-medium text-[#6698CC] mb-2">Travelers Information</h3>
-          <p>
-            <span className="font-medium">Amount of Travelers:</span> {formData.travelers}
-          </p>
-          <p>
-            <span className="font-medium">Pets:</span> {formData.pets ? 'Yes' : 'No'}
-          </p>
-          <p>
-            <span className="font-medium">Extra Luggage:</span> {formData.extraLuggage ? 'Yes' : 'No'}
-          </p>
-        </div>
+      <hr className="my-6" />
 
-        {/* Accessibility Info */}
-        <div>
-          <h3 className="text-lg font-medium text-[#6698CC] mb-2">Accessibility and Special Assistance</h3>
-          <p>
-            <span className="font-medium">Insurance:</span> {formData.insurance ? 'Yes' : 'No'}
-          </p>
-          <p>
-            <span className="font-medium">Pick Disabled Seats:</span> {formData.disabledSeats ? 'Yes' : 'No'}
-          </p>
-          <p>
-            <span className="font-medium">Special Assistance:</span> {formData.specialAssistance ? 'Yes' : 'No'}
-          </p>
-        </div>
-      </div>
+      <p className="text-lg font-bold">
+        {price !== undefined
+          ? `Price: $${price}`
+          : "Price not available for this selection."}
+      </p>
     </div>
   );
-};
+}
 
-export default Summary;
+
+
+
+
+
+
+
+
+

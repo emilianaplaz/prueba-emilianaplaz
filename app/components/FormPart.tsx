@@ -10,9 +10,11 @@ interface FormPartProps {
 const FormPart = ({ title, fields, formData, handleChange }: FormPartProps) => {
   return (
     <div className="space-y-8">
+      {/* Title */}
       <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
 
-      {fields.map((field) => (
+      {/* Fields */}
+      {fields.map(field => (
         <div key={field.name} className="space-y-4">
           <label htmlFor={field.name} className="block text-sm font-medium text-gray-600">
             {field.label}
@@ -22,15 +24,13 @@ const FormPart = ({ title, fields, formData, handleChange }: FormPartProps) => {
             <select
               id={field.name}
               name={field.name}
-              value={formData[field.name] || ''}
+              value={formData[field.name]}
               onChange={handleChange}
               className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="" disabled>
-                -- Select {field.label} --
-              </option>
-              {field.options?.map((option, idx) => (
-                <option key={idx} value={option}>
+              <option value="">-- Select --</option>
+              {field.options?.map(option => (
+                <option key={option} value={option}>
                   {option}
                 </option>
               ))}
@@ -40,9 +40,9 @@ const FormPart = ({ title, fields, formData, handleChange }: FormPartProps) => {
               type="checkbox"
               id={field.name}
               name={field.name}
-              checked={formData[field.name] || false}
+              checked={formData[field.name]}
               onChange={handleChange}
-              className="mt-2"
+              className="mt-2 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
           ) : (
             <input
@@ -52,7 +52,6 @@ const FormPart = ({ title, fields, formData, handleChange }: FormPartProps) => {
               value={formData[field.name]}
               onChange={handleChange}
               className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              required
             />
           )}
         </div>

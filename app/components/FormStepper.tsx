@@ -6,20 +6,35 @@ import Summary from './Summary';
 
 interface FlightInfo {
   destination: string;
-  classes: { [className: string]: number };
+  class: { [className: string]: number }; // ✅ corrected from `classes`
+}
+
+interface FormData {
+  destination: string;
+  departureDate: string;
+  returnDate: string;
+  flightType: string;
+  travelers: number;
+  pets: boolean;
+  extraLuggage: boolean;
+  insurance: boolean;
+  disabledSeats: boolean;
+  specialAssistance: boolean;
 }
 
 interface FormStepperProps {
   flightData: FlightInfo[];
 }
 
+const FLIGHT_CLASSES = ["Economy", "Business", "First Class"];
+
 const FormStepper = ({ flightData }: FormStepperProps) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     destination: '',
     departureDate: '',
     returnDate: '',
     flightType: '',
-    travelers: 0,
+    travelers: 1,
     pets: false,
     extraLuggage: false,
     insurance: false,
@@ -28,6 +43,9 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
   });
 
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Unique destinations only (no repeats)
+  const destinationOptions = Array.from(new Set(flightData.map(f => f.destination)));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
@@ -38,9 +56,13 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
         [target.name]: target.checked,
       }));
     } else {
+      let value: string | number = target.value;
+      if (target.name === 'travelers') {
+        value = Number(target.value);
+      }
       setFormData(prev => ({
         ...prev,
-        [target.name]: target.value,
+        [target.name]: value,
         ...(target.name === 'destination' ? { flightType: '' } : {}),
       }));
     }
@@ -49,19 +71,17 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
   const nextStep = () => setCurrentStep(prev => prev + 1);
   const prevStep = () => setCurrentStep(prev => prev - 1);
 
-  const destinationOptions = flightData.map(f => f.destination);
-  const selectedDestination = flightData.find(f => f.destination === formData.destination);
-  const flightClassOptions = selectedDestination ? Object.keys(selectedDestination.classes) : [];
+  const step1Fields = [
+    { label: 'Destination', name: 'destination', type: 'select', options: destinationOptions },
+    { label: 'Departure Date', name: 'departureDate', type: 'date' },
+    { label: 'Return Date', name: 'returnDate', type: 'date' },
+    { label: 'Type of Flight', name: 'flightType', type: 'select', options: FLIGHT_CLASSES },
+  ];
 
   const steps = [
     {
       title: 'Destination Details',
-      fields: [
-        { label: 'Destination', name: 'destination', type: 'select', options: destinationOptions },
-        { label: 'Departure Date', name: 'departureDate', type: 'date' },
-        { label: 'Return Date', name: 'returnDate', type: 'date' },
-        { label: 'Type of Flight', name: 'flightType', type: 'select', options: flightClassOptions },
-      ],
+      fields: step1Fields,
     },
     {
       title: 'Travelers Information',
@@ -113,7 +133,10 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
             type="button"
             onClick={nextStep}
             className="px-6 py-3 rounded-xl bg-[#6698CC] text-white font-semibold shadow-md hover:bg-[#5a8ac1] transition"
-            disabled={currentStep === 1 && (!formData.destination || !formData.flightType)}
+            disabled={
+              currentStep === 1 &&
+              (!formData.destination || !formData.flightType)
+            }
           >
             Next
           </button>
@@ -131,6 +154,9 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
 };
 
 export default FormStepper;
+
+
+
 
 
 
