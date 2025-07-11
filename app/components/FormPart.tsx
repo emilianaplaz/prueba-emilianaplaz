@@ -19,6 +19,7 @@ interface FormPartProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   incrementTravelers?: () => void;
   decrementTravelers?: () => void;
+  isStep1FieldValid?: (fieldName: string) => boolean;
 }
 
 const FormPart = ({
@@ -28,6 +29,7 @@ const FormPart = ({
   handleChange,
   incrementTravelers,
   decrementTravelers,
+  isStep1FieldValid,
 }: FormPartProps) => {
   return (
     <div>
@@ -35,6 +37,9 @@ const FormPart = ({
       <form>
         {fields.map(({ label, name, type, options, min, max, dependsOn }) => {
           if (dependsOn && !formData[dependsOn]) return null;
+
+          // Validar si el campo es válido (solo para paso 1)
+          const isValid = isStep1FieldValid ? isStep1FieldValid(name) : true;
 
           if (type === 'checkbox') {
             return (
@@ -67,7 +72,9 @@ const FormPart = ({
                   name={name}
                   value={formData[name]}
                   onChange={handleChange}
-                  className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                  className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                    isValid ? 'border-gray-300' : 'border-red-500'
+                  }`}
                 >
                   <option value="">Seleccione</option>
                   {options.map((opt) => (
@@ -81,6 +88,14 @@ const FormPart = ({
           }
 
           if (type === 'date') {
+            const today = new Date().toISOString().split('T')[0];
+            const minValue =
+              name === 'departureDate'
+                ? today
+                : name === 'returnDate' && formData['departureDate']
+                ? formData['departureDate']
+                : today;
+
             return (
               <label key={name} className="block mb-6">
                 <span className="block mb-1 font-medium">{label}</span>
@@ -89,8 +104,10 @@ const FormPart = ({
                   name={name}
                   value={formData[name]}
                   onChange={handleChange}
-                  className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
-                  min={name === 'departureDate' ? new Date().toISOString().split('T')[0] : undefined}
+                  min={minValue}
+                  className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                    isValid ? 'border-gray-300' : 'border-red-500'
+                  }`}
                 />
               </label>
             );
@@ -149,7 +166,9 @@ const FormPart = ({
                 value={formData[name]}
                 onChange={handleChange}
                 maxLength={name === 'specialAssistanceDescription' ? 200 : undefined}
-                className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                  isValid ? 'border-gray-300' : 'border-red-500'
+                }`}
               />
             </label>
           );
@@ -160,6 +179,9 @@ const FormPart = ({
 };
 
 export default FormPart;
+
+
+
 
 
 

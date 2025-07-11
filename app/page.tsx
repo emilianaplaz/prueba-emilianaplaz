@@ -3,7 +3,7 @@ import React from "react";
 
 export default function Home() {
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-black">
+    <main className="relative h-screen w-screen overflow-hidden bg-black font-sans">
       {/* Video de fondo */}
       <video
         autoPlay
@@ -15,46 +15,42 @@ export default function Home() {
         <source src="/video/airplane.mp4" type="video/mp4" />
       </video>
 
-      {/* Contenido principal */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-screen px-4 sm:px-6 md:px-8 text-center text-white max-w-7xl mx-auto">
-        <h2
-          className="
-            select-none font-extrabold text-yellow-400 tracking-widest leading-tight
-            text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl
-            max-w-full
-            px-2
-          "
-        >
-          {/* En mobile separar en dos líneas */}
-          <span className="block sm:inline">GLOBE</span>
-          <span className="block sm:inline">TROTTER</span>
-        </h2>
+      {/* Contenido alineado a la izquierda */}
+      <div className="relative z-10 flex items-center justify-start h-screen px-6 sm:px-12 md:px-20 text-white">
+        <div className="max-w-xl space-y-6">
+          <h2 className="text-[#FFD700] font-extrabold tracking-widest leading-tight text-5xl sm:text-6xl md:text-7xl lg:text-8xl select-none">
+            <span className="block">GLOBE</span>
+            <span className="block">TROTTER</span>
+          </h2>
 
-        <Link href="/form" passHref>
-          <button
-            className="
-              mt-8 sm:mt-10 px-6 sm:px-8 md:px-10 py-3 sm:py-4
-              bg-white/20
-              backdrop-blur-lg
-              border border-white/30
-              rounded-full
-              text-[#6698CC] font-extrabold text-base sm:text-lg tracking-wide
-              shadow-lg shadow-white/20
-              hover:bg-white/30
-              transition duration-300 ease-in-out
-              font-sans
-              select-none
-              max-w-xs sm:max-w-sm
-              truncate
-            "
-          >
-            Reserva tu próxima aventura
-          </button>
-        </Link>
+          <p className="text-[#FFD700] text-xl sm:text-2xl font-medium tracking-wide">
+            El mundo te espera, nosotros te llevamos
+          </p>
+
+          <Link href="/form" passHref>
+            <button
+                className="
+                mt-4 px-8 py-4
+                bg-[#FFD700]/90
+                backdrop-blur-lg
+                border border-[#FFD700]/70
+                rounded-full
+                text-[#1A2B44] font-extrabold text-lg tracking-wide
+                shadow-lg shadow-[#FFD700]/30
+                hover:bg-[#FFD700]
+                transition duration-300 ease-in-out
+                cursor-pointer
+              "
+            >
+              Reserva tu próxima aventura
+            </button>
+          </Link>
+        </div>
       </div>
     </main>
   );
 }
+
 
 
 

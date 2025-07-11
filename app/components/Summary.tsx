@@ -85,10 +85,7 @@ const Summary = ({ formData, flightData }: SummaryProps) => {
               <strong>Viajero #{i + 1}:</strong> {traveler.name || 'Sin nombre'}
             </p>
             <p>
-              <strong>Fecha de nacimiento:</strong> {traveler.birthdate || 'No especificado'}
-            </p>
-            <p>
-              <strong>Cédula / ID:</strong> {traveler.id || 'No especificado'}
+              <strong>Edad:</strong> {traveler.birthdate || 'No especificado'}
             </p>
           </div>
         ))}
@@ -107,7 +104,7 @@ const Summary = ({ formData, flightData }: SummaryProps) => {
           <strong>Seguro:</strong> {formData.insurance ? 'Sí' : 'No'}
         </p>
         <p>
-          <strong>Asientos para discapacitados:</strong> {formData.disabledSeats ? 'Sí' : 'No'}
+          <strong>Asientos preferenciales:</strong> {formData.disabledSeats ? 'Sí' : 'No'}
         </p>
         <p>
           <strong>Asistencia especial:</strong>{' '}

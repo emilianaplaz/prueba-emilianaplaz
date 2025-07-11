@@ -58,6 +58,9 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [expandedTravelers, setExpandedTravelers] = useState<boolean[]>([true]);
 
+  // Estado que controla si el usuario intentó avanzar para mostrar errores
+  const [triedToSubmit, setTriedToSubmit] = useState(false);
+
   const flightClasses = Array.from(new Set(flightData.map((f) => f.class)));
   const destinationOptions = Array.from(new Set(flightData.map((f) => f.destination)));
 
@@ -123,8 +126,93 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     });
   };
 
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
-  const prevStep = () => setCurrentStep((prev) => prev - 1);
+  // Función para validar los campos del paso 1 (solo activa si ya intentó avanzar)
+  const isStep1FieldValid = (fieldName: string) => {
+    if (!triedToSubmit) return true;
+
+    switch (fieldName) {
+      case 'destination':
+      case 'flightType':
+      case 'departureDate':
+      case 'returnDate':
+        if (!formData[fieldName]) return false;
+        if (fieldName === 'departureDate' && new Date(formData.departureDate) < new Date(new Date().toDateString()))
+          return false;
+        if (fieldName === 'returnDate' && new Date(formData.returnDate) <= new Date(formData.departureDate))
+          return false;
+        break;
+    }
+    return true;
+  };
+
+  // Validación simple para paso 2 (nombre y fecha de nacimiento de viajeros)
+  // Retorna true si válido o no se está en paso 2
+  const isTravelerFieldValid = (index: number, fieldName: keyof TravelerInfo) => {
+    if (!triedToSubmit) return true;
+    if (currentStep !== 2) return true;
+
+    const value = formData.travelersInfo[index][fieldName];
+
+    if (fieldName === 'name') {
+      // Solo letras y obligatorio
+      const onlyLetters = /^[A-Za-zÀ-ÿ\s]+$/;
+      return value.trim() !== '' && onlyLetters.test(value);
+    }
+    if (fieldName === 'birthdate') {
+      if (!value) return false;
+      const birthDate = new Date(value);
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      return birthDate < yesterday;
+    }
+
+    return true;
+  };
+
+  const nextStep = () => {
+    if (currentStep === 1) {
+      // Validar paso 1
+      if (
+        !formData.destination ||
+        !formData.flightType ||
+        !formData.departureDate ||
+        !formData.returnDate ||
+        new Date(formData.departureDate) < new Date(new Date().toDateString()) ||
+        new Date(formData.returnDate) <= new Date(formData.departureDate)
+      ) {
+        setTriedToSubmit(true);
+        return;
+      }
+    }
+
+    if (currentStep === 2) {
+      // Validar paso 2 viajeros
+      for (let i = 0; i < formData.travelers; i++) {
+        const traveler = formData.travelersInfo[i];
+        const onlyLetters = /^[A-Za-zÀ-ÿ\s]+$/;
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (
+          !traveler.name.trim() ||
+          !onlyLetters.test(traveler.name) ||
+          !traveler.birthdate ||
+          new Date(traveler.birthdate) >= yesterday
+        ) {
+          setTriedToSubmit(true);
+          return;
+        }
+      }
+    }
+
+    setTriedToSubmit(false);
+    setCurrentStep((prev) => prev + 1);
+  };
+
+  const prevStep = () => {
+    setTriedToSubmit(false);
+    setCurrentStep((prev) => prev - 1);
+  };
 
   const step1Fields = [
     {
@@ -193,7 +281,7 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-8 py-10 bg-white rounded-2xl shadow-xl">
+    <div className="text-black">
       {currentStep < steps.length ? (
         <>
           <FormPart
@@ -203,21 +291,21 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
             handleChange={handleChange}
             incrementTravelers={incrementTravelers}
             decrementTravelers={decrementTravelers}
+            isStep1FieldValid={isStep1FieldValid}
           />
 
-          {/* Mostrar subformularios para cada viajero */}
           {currentStep === 2 && (
             <div className="mt-8">
               <h3 className="text-xl font-semibold mb-4">Información de cada viajero</h3>
               {formData.travelersInfo.map((traveler, i) => (
                 <div
                   key={i}
-                  className="mb-4 border rounded-md p-4 shadow-sm bg-gray-50"
+                  className="mb-4 border rounded-md p-4 shadow-sm bg-white/10 backdrop-blur-sm border-white/20"
                 >
                   <button
                     type="button"
                     onClick={() => toggleTravelerExpand(i)}
-                    className="mb-3 text-left w-full font-semibold text-[#6698CC]"
+                    className="mb-3 text-left w-full font-semibold text-[#FFD700]"
                   >
                     {`Viajero #${i + 1} `}
                     <span>{expandedTravelers[i] ? '▲' : '▼'}</span>
@@ -232,7 +320,11 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
                           onChange={(e) =>
                             handleTravelerInfoChange(i, 'name', e.target.value)
                           }
-                          className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                          className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                            isTravelerFieldValid(i, 'name')
+                              ? 'border-gray-300'
+                              : 'border-red-500'
+                          }`}
                         />
                       </label>
                       <label className="block">
@@ -243,7 +335,11 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
                           onChange={(e) =>
                             handleTravelerInfoChange(i, 'birthdate', e.target.value)
                           }
-                          className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                          className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                            isTravelerFieldValid(i, 'birthdate')
+                              ? 'border-gray-300'
+                              : 'border-red-500'
+                          }`}
                         />
                       </label>
                       <label className="block">
@@ -273,7 +369,7 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
           <button
             type="button"
             onClick={prevStep}
-            className="px-6 py-3 rounded-xl bg-white border border-[#6698CC] text-[#6698CC] font-medium shadow-sm hover:bg-[#f0f7ff] transition"
+            className="px-6 py-3 rounded-xl border border-[#FFD700] text-[#FFD700] font-medium shadow-sm hover:bg-yellow-400/10 transition"
           >
             Anterior
           </button>
@@ -282,25 +378,14 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
           <button
             type="button"
             onClick={nextStep}
-            disabled={
-              currentStep === 1 &&
-              (
-                !formData.destination ||
-                !formData.flightType ||
-                !formData.departureDate ||
-                !formData.returnDate ||
-                new Date(formData.departureDate) < new Date(new Date().toDateString()) || // salida mínima hoy
-                new Date(formData.returnDate) <= new Date(formData.departureDate)
-              )
-            }
-            className="px-6 py-3 rounded-xl bg-[#6698CC] text-white font-semibold shadow-md hover:bg-[#5a8ac1] transition"
+            className="px-6 py-3 rounded-xl bg-[#FFD700] text-black font-semibold shadow-md hover:bg-yellow-400 transition"
           >
             Siguiente
           </button>
         ) : (
           <button
             type="submit"
-            className="px-6 py-3 rounded-xl bg-[#6698CC] text-white font-semibold shadow-md hover:bg-[#5a8ac1] transition"
+            className="px-6 py-3 rounded-xl bg-[#FFD700] text-black font-semibold shadow-md hover:bg-yellow-400 transition"
           >
             Enviar
           </button>
@@ -311,6 +396,12 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
 };
 
 export default FormStepper;
+
+
+
+
+
+
 
 
 
