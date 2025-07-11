@@ -13,16 +13,12 @@ export default async function Page() {
 
   return (
     <div className="relative p-10 bg-gradient-to-br from-[#f0f7ff] to-[#dceefc]">
-      {/* Fullscreen fixed video background with pointer-events-none to allow scroll */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="fixed top-0 left-0 w-full h-full object-cover z-0 pointer-events-none"
-      >
-        <source src="/video/airplane.mp4" type="video/mp4" />
-      </video>
+      {/* Imagen de fondo */}
+      <img
+        src="/img/airplane.png"
+        alt="Airplane background"
+        className="fixed top-0 left-0 w-full h-full object-cover z-0"
+      />
 
       {/* Content wrapper */}
       <div className="relative z-10 max-w-4xl mx-auto bg-white/30 backdrop-blur-md rounded-lg p-8 shadow-lg text-black mb-20">
