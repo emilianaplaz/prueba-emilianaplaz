@@ -4,12 +4,19 @@ import React from "react";
 export default function Home() {
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black font-sans">
-      {/* Imagen de fondo */}
-      <img
-        src="/img/airplane.png"
-        alt="Airplane background"
-        className="fixed top-0 left-0 w-full h-full object-cover z-0"
+       {/* Video de fondo */}
+      <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      className="fixed top-0 left-0 w-full h-full object-cover z-0"
+    >
+      <source
+        src="./img/airplane.mp4"
+        type="video/mp4"
       />
+    </video>
 
       {/* Contenido alineado a la izquierda */}
       <div className="relative z-10 flex items-center justify-start h-screen px-6 sm:px-12 md:px-20 text-white">
