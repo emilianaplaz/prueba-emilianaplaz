@@ -1,4 +1,5 @@
 import FormStepper from '../components/FormStepper';
+import '../globals.css';
 
 const getFlightData = async () => {
   const res = await fetch('https://raw.githubusercontent.com/Lstanislao/cities-permalink/main/flights.json');

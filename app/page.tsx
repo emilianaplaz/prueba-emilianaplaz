@@ -3,42 +3,60 @@ import React from "react";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen flex items-center justify-center overflow-hidden text-white">
-      {/* Background Video */}
+    <main className="relative h-screen w-screen overflow-hidden bg-black">
+      {/* Video de fondo */}
       <video
         autoPlay
-        muted
         loop
+        muted
         playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover z-0"
+        className="fixed top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src="/video/airplane2.mp4" type="video/mp4" />
+        <source src="/video/airplane.mp4" type="video/mp4" />
       </video>
 
-      {/* Overlay oscuro para legibilidad */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-40 z-10" />
-
-      {/* Main content */}
-      <div className="relative z-20 text-center px-6 max-w-3xl">
-        <h1 className="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-md">
-          Bienvenido a
-        </h1>
-
-        <h2 className="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-[#93c5fd] via-white to-[#60a5fa] text-transparent bg-clip-text mb-8">
-          GLOBETROTTER
+      {/* Contenido principal */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-screen px-4 sm:px-6 md:px-8 text-center text-white max-w-7xl mx-auto">
+        <h2
+          className="
+            select-none font-extrabold text-yellow-400 tracking-widest leading-tight
+            text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl
+            max-w-full
+            px-2
+          "
+        >
+          {/* En mobile separar en dos líneas */}
+          <span className="block sm:inline">GLOBE</span>
+          <span className="block sm:inline">TROTTER</span>
         </h2>
 
-        <p className="text-lg text-gray-100 mb-10 drop-shadow-sm">
-          Descubre el mundo con nosotros. Vuela fácil, seguro y a tu medida.
-        </p>
-
-        <Link
-          href="/form"
-          className="inline-block px-8 py-4 bg-white text-[#1e3a8a] text-lg font-semibold rounded-full shadow-lg hover:bg-gray-200 transition-all duration-300"
-        >
-          Comenzar Reservación
+        <Link href="/form" passHref>
+          <button
+            className="
+              mt-8 sm:mt-10 px-6 sm:px-8 md:px-10 py-3 sm:py-4
+              bg-white/20
+              backdrop-blur-lg
+              border border-white/30
+              rounded-full
+              text-[#6698CC] font-extrabold text-base sm:text-lg tracking-wide
+              shadow-lg shadow-white/20
+              hover:bg-white/30
+              transition duration-300 ease-in-out
+              font-sans
+              select-none
+              max-w-xs sm:max-w-sm
+              truncate
+            "
+          >
+            Reserva tu próxima aventura
+          </button>
         </Link>
       </div>
     </main>
   );
 }
+
+
+
+
+
