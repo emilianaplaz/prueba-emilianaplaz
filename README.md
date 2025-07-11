@@ -1,5 +1,5 @@
-## Globetrotter: Online Flight Booker
-# This project is an example trip booking system, written in TypeScript and built with Next.js, allowing users to easily book flights online.
+# Globetrotter: Online Flight Booker
+## This project is an example trip booking system, written in TypeScript and built with Next.js, allowing users to easily book flights online.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
