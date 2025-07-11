@@ -1,66 +1,175 @@
+'use client';
+
 import React from 'react';
+
+interface Field {
+  label: string;
+  name: string;
+  type: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+  dependsOn?: string;
+}
 
 interface FormPartProps {
   title: string;
-  fields: Array<{ label: string; name: string; type: string; options?: string[] }>;
-  formData: any;
+  fields: Field[];
+  formData: { [key: string]: any };
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  incrementTravelers?: () => void;
+  decrementTravelers?: () => void;
 }
 
-const FormPart = ({ title, fields, formData, handleChange }: FormPartProps) => {
+const FormPart = ({
+  title,
+  fields,
+  formData,
+  handleChange,
+  incrementTravelers,
+  decrementTravelers,
+}: FormPartProps) => {
   return (
-    <div className="space-y-8">
-      {/* Title */}
-      <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
+    <div>
+      <h2 className="text-xl font-semibold mb-6">{title}</h2>
+      <form>
+        {fields.map(({ label, name, type, options, min, max, dependsOn }) => {
+          if (dependsOn && !formData[dependsOn]) return null;
 
-      {/* Fields */}
-      {fields.map(field => (
-        <div key={field.name} className="space-y-4">
-          <label htmlFor={field.name} className="block text-sm font-medium text-gray-600">
-            {field.label}
-          </label>
+          if (type === 'checkbox') {
+            return (
+              <label
+                key={name}
+                className="flex items-center mb-6 space-x-3 select-none"
+                style={{ minHeight: '2.5rem' }}
+              >
+                <input
+                  type="checkbox"
+                  name={name}
+                  checked={!!formData[name]}
+                  onChange={handleChange}
+                  className="relative w-10 h-5 appearance-none bg-gray-300 rounded-full
+                             checked:bg-[#6698CC] transition-colors duration-300
+                             cursor-pointer before:content-[''] before:absolute before:left-0.5 before:top-0.5
+                             before:bg-white before:border before:rounded-full before:h-4 before:w-4 before:transition-transform
+                             checked:before:translate-x-5"
+                />
+                <span className="text-base font-medium">{label}</span>
+              </label>
+            );
+          }
 
-          {field.type === 'select' ? (
-            <select
-              id={field.name}
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleChange}
-              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">-- Select --</option>
-              {field.options?.map(option => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          ) : field.type === 'checkbox' ? (
-            <input
-              type="checkbox"
-              id={field.name}
-              name={field.name}
-              checked={formData[field.name]}
-              onChange={handleChange}
-              className="mt-2 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-          ) : (
-            <input
-              type={field.type}
-              id={field.name}
-              name={field.name}
-              value={formData[field.name]}
-              onChange={handleChange}
-              className="mt-2 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          )}
-        </div>
-      ))}
+          if (type === 'select' && options) {
+            return (
+              <label key={name} className="block mb-6">
+                <span className="block mb-1 font-medium">{label}</span>
+                <select
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                >
+                  <option value="">Seleccione</option>
+                  {options.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            );
+          }
+
+          if (type === 'date') {
+            return (
+              <label key={name} className="block mb-6">
+                <span className="block mb-1 font-medium">{label}</span>
+                <input
+                  type="date"
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                  min={name === 'departureDate' ? new Date().toISOString().split('T')[0] : undefined}
+                />
+              </label>
+            );
+          }
+
+          if (type === 'number') {
+            return (
+              <label key={name} className="block mb-6">
+                <span className="block mb-1 font-medium">{label}</span>
+                <input
+                  type="number"
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                  className="block w-24 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+                  min={min}
+                  max={max}
+                />
+              </label>
+            );
+          }
+
+          if (type === 'stepper') {
+            return (
+              <div key={name} className="mb-6">
+                <span className="block mb-1 font-medium">{label}</span>
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={decrementTravelers}
+                    className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                    disabled={formData[name] <= 1}
+                  >
+                    -
+                  </button>
+                  <span className="text-lg select-none">{formData[name]}</span>
+                  <button
+                    type="button"
+                    onClick={incrementTravelers}
+                    className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                    disabled={formData[name] >= 10}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <label key={name} className="block mb-6">
+              <span className="block mb-1 font-medium">{label}</span>
+              <input
+                type="text"
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                maxLength={name === 'specialAssistanceDescription' ? 200 : undefined}
+                className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC]"
+              />
+            </label>
+          );
+        })}
+      </form>
     </div>
   );
 };
 
 export default FormPart;
+
+
+
+
+
+
+
+
+
+
 
 
 

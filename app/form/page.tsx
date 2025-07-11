@@ -9,8 +9,12 @@ export default async function Page() {
   const flightData = await getFlightData();
 
   return (
-    <div className="min-h-screen bg-gray-50 p-10">
+    <div className="min-h-screen bg-gradient-to-br from-[#f0f7ff] to-[#dceefc] p-10">
+      <div className="text-center mb-12">
+      </div>
+
       <FormStepper flightData={flightData} />
     </div>
   );
 }
+
