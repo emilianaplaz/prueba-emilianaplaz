@@ -4,16 +4,12 @@ import React from "react";
 export default function Home() {
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-black font-sans">
-      {/* Video de fondo */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
+      {/* Imagen de fondo */}
+      <img
+        src="/img/airplane.png"
+        alt="Airplane background"
         className="fixed top-0 left-0 w-full h-full object-cover z-0"
-      >
-        <source src="/video/airplane.mp4" type="video/mp4" />
-      </video>
+      />
 
       {/* Contenido alineado a la izquierda */}
       <div className="relative z-10 flex items-center justify-start h-screen px-6 sm:px-12 md:px-20 text-white">
@@ -29,7 +25,7 @@ export default function Home() {
 
           <Link href="/form" passHref>
             <button
-                className="
+              className="
                 mt-4 px-8 py-4
                 bg-[#FFD700]/90
                 backdrop-blur-lg
