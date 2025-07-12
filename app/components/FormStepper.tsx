@@ -3,18 +3,17 @@
 import React, { useState } from 'react';
 import FormPart from './FormPart';
 import Summary from './Summary';
+import { Field } from './FormPart';
 
-// Interfaz para la información de cada viajero
 interface TravelerInfo {
   name: string;
   birthdate: string;
   idType: 'pasaporte' | 'cedula' | '';
   idNumber: string;
-  id: string; // Se mantiene por compatibilidad
+  id: string;
 }
 
-// Interfaz general del formulario completo
-interface FormData {
+export interface FormData {
   destination: string;
   departureDate: string;
   returnDate: string;
@@ -31,7 +30,6 @@ interface FormData {
   travelersInfo: TravelerInfo[];
 }
 
-// Datos del vuelo
 interface FlightInfo {
   destination: string;
   class: string;
@@ -43,7 +41,6 @@ interface FormStepperProps {
 }
 
 const FormStepper = ({ flightData }: FormStepperProps) => {
-  // Estado inicial del formulario
   const initialFormData: FormData = {
     destination: '',
     departureDate: '',
@@ -58,23 +55,18 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     disabledSeats: false,
     specialAssistance: false,
     specialAssistanceDescription: '',
-    travelersInfo: [
-      { name: '', birthdate: '', idType: '', idNumber: '', id: '' },
-    ],
+    travelersInfo: [{ name: '', birthdate: '', idType: '', idNumber: '', id: '' }],
   };
 
-  // Estados del componente
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [currentStep, setCurrentStep] = useState(1); // Paso actual
-  const [expandedTravelers, setExpandedTravelers] = useState<boolean[]>([true]); // Control para expandir info viajero
-  const [triedToSubmit, setTriedToSubmit] = useState(false); // Marca si se intentó enviar
-  const [confirmationNumber, setConfirmationNumber] = useState<string | null>(null); // Confirmación final
+  const [currentStep, setCurrentStep] = useState(1);
+  const [expandedTravelers, setExpandedTravelers] = useState<boolean[]>([true]);
+  const [triedToSubmit, setTriedToSubmit] = useState(false);
+  const [confirmationNumber, setConfirmationNumber] = useState<string | null>(null);
 
-  // Extrae las opciones únicas desde los datos del vuelo
   const flightClasses = Array.from(new Set(flightData.map((f) => f.class)));
   const destinationOptions = Array.from(new Set(flightData.map((f) => f.destination)));
 
-  // Maneja cambios de campos de formulario generales (input/select)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
 
@@ -95,14 +87,12 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     }
   };
 
-  // Cambios en campos individuales de cada viajero
   const handleTravelerInfoChange = (index: number, field: keyof TravelerInfo, value: string) => {
     const updatedTravelers = [...formData.travelersInfo];
     updatedTravelers[index] = { ...updatedTravelers[index], [field]: value };
     setFormData((prev) => ({ ...prev, travelersInfo: updatedTravelers }));
   };
 
-  // Incrementar cantidad de viajeros
   const incrementTravelers = () => {
     if (formData.travelers < 10) {
       setFormData((prev) => ({
@@ -114,7 +104,6 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     }
   };
 
-  // Disminuir cantidad de viajeros
   const decrementTravelers = () => {
     if (formData.travelers > 1) {
       setFormData((prev) => ({
@@ -126,7 +115,6 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     }
   };
 
-  // Mostrar/ocultar info del viajero
   const toggleTravelerExpand = (index: number) => {
     setExpandedTravelers((prev) => {
       const newExpanded = [...prev];
@@ -135,8 +123,7 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     });
   };
 
-  // Validación de campos del paso 1
-  const isStep1FieldValid = (fieldName: string) => {
+  const isStep1FieldValid = (fieldName: keyof FormData) => {
     if (!triedToSubmit) return true;
 
     switch (fieldName) {
@@ -148,17 +135,18 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
         if (
           fieldName === 'departureDate' &&
           new Date(formData.departureDate) < new Date(new Date().toDateString())
-        ) return false;
+        )
+          return false;
         if (
           fieldName === 'returnDate' &&
           new Date(formData.returnDate) <= new Date(formData.departureDate)
-        ) return false;
+        )
+          return false;
         break;
     }
     return true;
   };
 
-  // Validación de campos por viajero
   const isTravelerFieldValid = (index: number, fieldName: keyof TravelerInfo) => {
     if (!triedToSubmit || currentStep !== 2) return true;
 
@@ -185,7 +173,6 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     return true;
   };
 
-  // Avanza de paso si pasa validaciones
   const nextStep = () => {
     if (currentStep === 1) {
       if (
@@ -227,41 +214,43 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     setCurrentStep((prev) => prev + 1);
   };
 
-  // Regresa un paso atrás
   const prevStep = () => {
     setTriedToSubmit(false);
     setCurrentStep((prev) => prev - 1);
   };
 
-  // Campos visibles para el paso 1
-  const step1Fields = [
+  const step1Fields: Field[] = [
     { label: 'Destino', name: 'destination', type: 'select', options: destinationOptions },
     { label: 'Fecha de salida', name: 'departureDate', type: 'date' },
     { label: 'Fecha de regreso', name: 'returnDate', type: 'date' },
     { label: 'Clase de vuelo', name: 'flightType', type: 'select', options: flightClasses },
   ];
 
-  // Definición de los pasos del formulario
-  const steps = [
+  const steps: { title: string; fields: Field[] }[] = [
     { title: 'Detalles del destino', fields: step1Fields },
-    { title: 'Información de viajeros', fields: [
-      { label: 'Número de viajeros', name: 'travelers', type: 'stepper' },
-      { label: 'Mascotas', name: 'pets', type: 'checkbox' },
-      { label: 'Número de mascotas', name: 'petsCount', type: 'number', min: 1, max: 99, dependsOn: 'pets' },
-      { label: 'Equipaje extra', name: 'extraLuggage', type: 'checkbox' },
-      { label: 'Número de equipajes extra', name: 'extraLuggageCount', type: 'number', min: 1, max: 99, dependsOn: 'extraLuggage' }
-    ]},
-    { title: 'Asistencia y servicios especiales', fields: [
-      { label: 'Seguro', name: 'insurance', type: 'checkbox' },
-      { label: 'Seleccionar asientos para discapacitados', name: 'disabledSeats', type: 'checkbox' },
-      { label: 'Asistencia especial', name: 'specialAssistance', type: 'checkbox' },
-      { label: 'Explique la asistencia especial (máx. 200 caracteres)', name: 'specialAssistanceDescription', type: 'text', dependsOn: 'specialAssistance' }
-    ]},
+    {
+      title: 'Información de viajeros',
+      fields: [
+        { label: 'Número de viajeros', name: 'travelers', type: 'stepper' },
+        { label: 'Mascotas', name: 'pets', type: 'checkbox' },
+        { label: 'Número de mascotas', name: 'petsCount', type: 'number', min: 1, max: 99, dependsOn: 'pets' },
+        { label: 'Equipaje extra', name: 'extraLuggage', type: 'checkbox' },
+        { label: 'Número de equipajes extra', name: 'extraLuggageCount', type: 'number', min: 1, max: 99, dependsOn: 'extraLuggage' },
+      ],
+    },
+    {
+      title: 'Asistencia y servicios especiales',
+      fields: [
+        { label: 'Seguro', name: 'insurance', type: 'checkbox' },
+        { label: 'Seleccionar asientos para discapacitados', name: 'disabledSeats', type: 'checkbox' },
+        { label: 'Asistencia especial', name: 'specialAssistance', type: 'checkbox' },
+        { label: 'Explique la asistencia especial (máx. 200 caracteres)', name: 'specialAssistanceDescription', type: 'text', dependsOn: 'specialAssistance' },
+      ],
+    },
     { title: 'Resumen', fields: [] },
-    { title: 'Confirmación', fields: [] }
+    { title: 'Confirmación', fields: [] },
   ];
 
-  // Pantalla de confirmación
   if (currentStep === steps.length) {
     return (
       <div className="text-center mt-20">
@@ -285,7 +274,6 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
     );
   }
 
-  // Render principal del formulario por paso
   return (
     <div className="text-black">
       {currentStep < steps.length - 1 ? (
@@ -300,7 +288,6 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
             isStep1FieldValid={isStep1FieldValid}
           />
 
-          {/** Información por viajero individual (solo paso 2) */}
           {currentStep === 2 && (
             <div className="mt-8">
               <h3 className="text-xl font-semibold mb-4">Información de cada viajero</h3>
@@ -312,87 +299,73 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
                   <button
                     type="button"
                     onClick={() => toggleTravelerExpand(i)}
-                    className="mb-3 text-left w-full font-semibold text-[#FFD700]"
+                    className="w-full text-left text-lg font-semibold mb-2"
                   >
-                    {`Viajero #${i + 1} `}
-                    <span>{expandedTravelers[i] ? '▲' : '▼'}</span>
+                    Viajero #{i + 1}
                   </button>
                   {expandedTravelers[i] && (
-                    <div className="space-y-4">
-                      {/* Campo: nombre */}
-                      <label className="block">
-                        <span className="block mb-1 font-medium">Nombre completo</span>
+                    <>
+                      <label className="block mb-4">
+                        Nombre completo:
                         <input
                           type="text"
                           value={traveler.name}
                           onChange={(e) => handleTravelerInfoChange(i, 'name', e.target.value)}
-                          className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                          className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
                             isTravelerFieldValid(i, 'name') ? 'border-gray-300' : 'border-red-500'
                           }`}
                         />
                       </label>
-
-                      {/* Campo: fecha de nacimiento */}
-                      <label className="block">
-                        <span className="block mb-1 font-medium">Fecha de nacimiento</span>
+                      <label className="block mb-4">
+                        Fecha de nacimiento:
                         <input
                           type="date"
                           value={traveler.birthdate}
                           onChange={(e) => handleTravelerInfoChange(i, 'birthdate', e.target.value)}
-                          className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                          className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
                             isTravelerFieldValid(i, 'birthdate') ? 'border-gray-300' : 'border-red-500'
                           }`}
                         />
                       </label>
-
-                      {/* Campo: tipo de documento */}
-                      <label className="block">
-                        <span className="block mb-1 font-medium">Tipo de documento</span>
+                      <label className="block mb-4">
+                        Tipo de documento:
                         <select
                           value={traveler.idType}
                           onChange={(e) => handleTravelerInfoChange(i, 'idType', e.target.value)}
-                          className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                          className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
                             isTravelerFieldValid(i, 'idType') ? 'border-gray-300' : 'border-red-500'
                           }`}
                         >
                           <option value="">Seleccione</option>
-                          <option value="cedula">Cédula</option>
                           <option value="pasaporte">Pasaporte</option>
+                          <option value="cedula">Cédula</option>
                         </select>
                       </label>
-
-                      {/* Campo: número de documento */}
-                      {traveler.idType && (
-                        <label className="block">
-                          <span className="block mb-1 font-medium">
-                            Número de {traveler.idType === 'cedula' ? 'cédula' : 'pasaporte'}
-                          </span>
-                          <input
-                            type="text"
-                            value={traveler.idNumber}
-                            onChange={(e) => handleTravelerInfoChange(i, 'idNumber', e.target.value)}
-                            maxLength={20}
-                            pattern="[0-9]*"
-                            inputMode="numeric"
-                            className={`block w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
-                              isTravelerFieldValid(i, 'idNumber') ? 'border-gray-300' : 'border-red-500'
-                            }`}
-                            required
-                          />
-                        </label>
-                      )}
-                    </div>
+                      <label className="block mb-4">
+                        Número de documento:
+                        <input
+                          type="text"
+                          value={traveler.idNumber}
+                          onChange={(e) => handleTravelerInfoChange(i, 'idNumber', e.target.value)}
+                          className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#6698CC] ${
+                            isTravelerFieldValid(i, 'idNumber') ? 'border-gray-300' : 'border-red-500'
+                          }`}
+                        />
+                      </label>
+                    </>
                   )}
                 </div>
               ))}
             </div>
           )}
+
+         
         </>
       ) : (
-        <Summary formData={formData} flightData={flightData} />
+        <Summary formData={formData} flightData={flightData} /> 
       )}
-
-      {/* Botones de navegación entre pasos */}
+    
+     {/* Botones de navegación entre pasos */}
       <div className="mt-12 flex justify-center gap-6">
         {currentStep > 1 && (
           <button
@@ -432,6 +405,8 @@ const FormStepper = ({ flightData }: FormStepperProps) => {
 };
 
 export default FormStepper;
+
+
 
 
 
