@@ -85,7 +85,7 @@ const Summary = ({ formData, flightData }: SummaryProps) => {
               <strong>Viajero #{i + 1}:</strong> {traveler.name || 'Sin nombre'}
             </p>
             <p>
-              <strong>Edad:</strong> {traveler.birthdate || 'No especificado'}
+              <strong>Fecha de nacimiento:</strong> {traveler.birthdate || 'No especificado'}
             </p>
           </div>
         ))}

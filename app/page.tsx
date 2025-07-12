@@ -13,7 +13,7 @@ export default function Home() {
       className="fixed top-0 left-0 w-full h-full object-cover z-0"
     >
       <source
-        src="./img/airplane.mp4"
+        src="./video/airplane.mp4"
         type="video/mp4"
       />
     </video>
