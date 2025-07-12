@@ -44,7 +44,7 @@ const Summary = ({ formData, flightData }: SummaryProps) => {
 
   const basePrice = flight ? flight.priceUSD : 0;
 
-  let totalPrice =
+  const totalPrice =
     basePrice * formData.travelers +
     (formData.pets ? formData.petsCount * 100 : 0) + // 100$ por mascota
     (formData.extraLuggage ? formData.extraLuggageCount * 50 : 0) + // 50$ por equipaje extra

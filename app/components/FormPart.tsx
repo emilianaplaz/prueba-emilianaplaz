@@ -13,6 +13,7 @@ interface Field {
   dependsOn?: string;       // Nombre de campo del que depende para mostrarse (condicional)
 }
 
+
 // Props que recibe el componente FormPart
 interface FormPartProps {
   title: string;                         // Título de la sección del formulario
@@ -218,6 +219,7 @@ const FormPart = ({
 };
 
 export default FormPart;
+
 
 
 
